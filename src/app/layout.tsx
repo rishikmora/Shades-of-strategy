@@ -31,8 +31,17 @@ const mono = Geist_Mono({
   display: "swap",
 });
 
+/** Never let a malformed site URL break the build. */
+function metadataBase() {
+  try {
+    return new URL(siteConfig.url);
+  } catch {
+    return new URL("http://localhost:3000");
+  }
+}
+
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: metadataBase(),
   title: {
     default: siteConfig.seo.title,
     template: `%s | ${siteConfig.name}`,
