@@ -8,7 +8,24 @@
  * - Keep lines short. Every word must earn its place.
  */
 
-const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+/** Accepts "yourdomain.com", "https://yourdomain.com/" or nothing at all. */
+function resolveSiteUrl() {
+  const candidates = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    process.env.VERCEL_URL,
+  ];
+  for (const raw of candidates) {
+    const value = raw?.trim();
+    if (!value) continue;
+    try {
+      return new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`).origin;
+    } catch {
+      /* not a usable URL, try the next one */
+    }
+  }
+  return "http://localhost:3000";
+}
 
 export const siteConfig = {
   name: "Shades of Strategy",
@@ -16,9 +33,7 @@ export const siteConfig = {
   tagline: "Creative × Technology",
 
   /** Set NEXT_PUBLIC_SITE_URL in production (e.g. https://yourdomain.com). */
-  url:
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    (vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000"),
+  url: resolveSiteUrl(),
 
   seo: {
     title: "Shades of Strategy | Creative & Technology Agency",
